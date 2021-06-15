@@ -61,20 +61,21 @@ class _AppState extends State<App> {
     ]);
 
     return Theme(
-        data: appTheme,
-        child: StoreProvider(
-          store: _store,
-          child: MaterialApp(
-            themeMode: ThemeMode.dark,
-            debugShowCheckedModeBanner: false,
-            navigatorKey: navigatorKey,
-            title: Strings.appName,
-            theme: ThemeData(
-              primarySwatch: Colors.blue,
-            ),
-            onGenerateRoute: generateRoute,
-            initialRoute: AppRoutes.homeRoute,
+      data: appTheme,
+      child: StoreProvider(
+        store: _store,
+        child: MaterialApp(
+          themeMode: ThemeMode.dark,
+          debugShowCheckedModeBanner: false,
+          navigatorKey: navigatorKey,
+          title: Strings.appName,
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
           ),
-        ));
+          onGenerateRoute: generateRoute,
+          initialRoute: AppRoutes.homeRoute,
+        ),
+      ),
+    );
   }
 }
