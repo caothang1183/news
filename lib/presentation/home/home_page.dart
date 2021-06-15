@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:news/constants/emuns.dart';
 import 'package:news/constants/strings.dart';
 import 'package:news/presentation/home/fragments/headline_fragment.dart';
 import 'package:news/presentation/home/fragments/profile_fragment.dart';
 import 'package:news/presentation/home/fragments/topics_fragment.dart';
 import 'package:news/presentation/home/widgets/bottom_tab_bar.dart';
+import 'package:news/redux/actions/app_actions.dart';
+import 'package:news/redux/actions/route_actions.dart';
+import 'package:news/redux/selectors/app_state_selector.dart';
+import 'package:news/redux/states/app_state.dart';
+import 'package:redux/redux.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -30,28 +37,59 @@ class _HomePageState extends State<HomePage> {
       ProfileFragment(),
     ];
 
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        title: Text(titles[0]),
-        actions: [
-          TextButton(
-            onPressed: () {},
-            child: Padding(
-              padding: const EdgeInsets.only(right: 10),
-              child: Text(
-                "Login",
-                style: TextStyle(color: Colors.white),
-              ),
+    return StoreConnector<AppState, _ViewModel>(
+        converter: _ViewModel.fromStore,
+        onInit: (store) {},
+        builder: (context, vm) {
+          return Scaffold(
+            key: _scaffoldKey,
+            appBar: AppBar(
+              title: Text(titles[vm.currentIndex]),
+              actions: [
+                TextButton(
+                  onPressed: vm.openLoginPage,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: Text(
+                      "Login",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                )
+              ],
             ),
-          )
-        ],
+            body: fragments.elementAt(vm.currentIndex),
+            bottomNavigationBar: BottomTabBar(
+              currentIndex: vm.currentIndex,
+              onTap: vm.onBottomTap,
+            ),
+          );
+        });
+  }
+}
+
+class _ViewModel {
+  final int currentIndex;
+  final Function onBottomTap;
+  final Function openLoginPage;
+
+  _ViewModel({
+    this.currentIndex,
+    this.onBottomTap,
+    this.openLoginPage,
+  });
+
+  static _ViewModel fromStore(Store<AppState> store) {
+    return _ViewModel(
+      currentIndex: bottomAppBarSelector(store.state).index,
+      onBottomTap: (index) => store.dispatch(
+        SelectBottomTabBarAction(
+          activeTab: TabBarModel.values[index],
+        ),
       ),
-      body: fragments.elementAt(0),
-      bottomNavigationBar: BottomTabBar(
-        currentIndex: 0,
-        onTap: (index) {},
-      ),
+      openLoginPage: () {
+        store.dispatch(OpenLoginPageAction());
+      },
     );
   }
 }
